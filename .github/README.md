@@ -21,7 +21,7 @@ There are 4 ways to install this plugin:
 
 ## LICENSE
 
-Localized App Title is licensed under the [MIT License](LICENSE). Please note that this asset uses [AppIconChangerUnity](https://github.com/kyubuns/AppIconChangerUnity) and [zipstorer](https://github.com/jaime-olivares/zipstorer) assets which are also licensed under the MIT License. See [ThirdPartyNotices.txt](Plugins/LocalizedAppTitle/ThirdPartyNotices.txt) in the package for more details.
+Localized App Title is licensed under the [MIT License](LICENSE). Please note that this asset uses [AppIconChangerUnity](https://github.com/kyubuns/AppIconChangerUnity) and [zipstorer](https://github.com/jaime-olivares/zipstorer) assets which are also licensed under the MIT License. See [ThirdPartyNotices.txt](../Plugins/LocalizedAppTitle/ThirdPartyNotices.txt) in the package for more details.
 
 ## HOW TO
 
