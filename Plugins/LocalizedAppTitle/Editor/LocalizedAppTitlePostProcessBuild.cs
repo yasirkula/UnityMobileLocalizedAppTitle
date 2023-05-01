@@ -246,12 +246,10 @@ namespace LocalizedAppTitleNamespace
 				{
 					string languageCode = LocalizedData[i].LanguageCode;
 					int languageSubCodeIndex = languageCode.IndexOf( '-' );
-					if( languageSubCodeIndex > 0 )
+					if( languageSubCodeIndex > 0 && languageCode[languageSubCodeIndex + 1] != 'r' )
 					{
-						string _languageCode = languageCode;
-						languageCode = languageCode.Substring( 0, languageSubCodeIndex );
-
-						Debug.LogWarning( "(LocalizedAppTitle) Android doesn't support language sub-codes, changing " + _languageCode + " to " + languageCode );
+						languageCode = string.Concat( languageCode.Substring( 0, languageSubCodeIndex ), "-r", languageCode.Substring( languageSubCodeIndex + 1 ) );
+						Debug.LogWarning( "(LocalizedAppTitle) Converted " + LocalizedData[i].LanguageCode + " to " + languageCode );
 					}
 
 					if( !processedLanguages.Add( languageCode ) )

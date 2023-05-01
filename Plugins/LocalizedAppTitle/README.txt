@@ -1,4 +1,4 @@
-= Localized App Title for Android & iOS =
+= Localized App Title for Android & iOS (v1.0.1) =
 
 Online documentation available at: https://github.com/yasirkula/UnityMobileLocalizedAppTitle
 E-mail: yasirkula@gmail.com
