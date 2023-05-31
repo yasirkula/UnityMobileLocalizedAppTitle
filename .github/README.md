@@ -4,7 +4,7 @@
 
 **Discord:** https://discord.gg/UJJt549AaV
 
-**[Support the Developer ☕](https://yasirkula.itch.io/unity3d)**
+**[GitHub Sponsors ☕](https://github.com/sponsors/yasirkula)**
 
 This plugin helps you localize your app's name and/or icon on Android & iOS. Note that the icon doesn't automatically change with the device language on iOS but it's possible to change it at runtime via scripting API.
 
