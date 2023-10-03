@@ -498,7 +498,7 @@ namespace LocalizedAppTitleNamespace
 
 						// Add localization folder as reference to the project
 						// Credit: https://forum.unity.com/threads/how-to-add-infoplist-strings-into-xcode-project-in-script.394488/#post-7046881
-						string localizationFolderGuid = pbxProject.AddFolderReference( localizationFolder, Path.GetFileName( localizationFolder ), PBXSourceTree.Source );
+						string localizationFolderGuid = pbxProject.AddFolderReference( Path.GetFileName( localizationFolder ), Path.GetFileName( localizationFolder ), PBXSourceTree.Source );
 						pbxProject.AddFileToBuild( unityFrameworkGUID, localizationFolderGuid );
 #if UNITY_2019_3_OR_NEWER
 						pbxProject.AddFileToBuild( mainTargetGUID, localizationFolderGuid );
@@ -510,18 +510,20 @@ namespace LocalizedAppTitleNamespace
 						// Create localized icons
 						// Credit: https://stackoverflow.com/questions/51949430/changing-alternate-icon-for-ipad
 						// Credit (MIT-License): https://github.com/kyubuns/AppIconChangerUnity/blob/4c608cce17aa824f479a76386cc6008bdfd388f0/Assets/Plugins/AppIconChanger/Editor/PostProcesser.cs
-						string iconsFolder = Path.Combine( buildPath, "LocalizedIcon_" + localizedData.LanguageCode );
-						Directory.CreateDirectory( iconsFolder );
+						string iconsFolderRelativePath = "LocalizedIcon_" + localizedData.LanguageCode;
+						string iconsFolderFullPath = Path.Combine( buildPath, iconsFolderRelativePath );
+						Directory.CreateDirectory( iconsFolderFullPath );
 
 						for( int i = 0; i < iconsFilenames.Length; i++ )
 						{
-							string iconFullFilename = "LocalizedIcon_" + localizedData.LanguageCode + iconsFilenames[i];
-							string iconFullPath = Path.Combine( iconsFolder, iconFullFilename );
+							string iconFilename = "LocalizedIcon_" + localizedData.LanguageCode + iconsFilenames[i];
+							string iconRelativePath = iconsFolderRelativePath + "/" + iconFilename;
+							string iconFullPath = Path.Combine( iconsFolderFullPath, iconFilename );
 
 							localizedData.iOSIcon.SaveAs( iconFullPath, iconsResolutions[i] );
 
 							// Add icon files as reference to the project (adding only the folder as reference won't work, icon files must be added explicitly instead)
-							string localizedIconGuid = pbxProject.AddFile( iconFullPath, "LocalizedIcon_" + localizedData.LanguageCode + "/" + iconFullFilename, PBXSourceTree.Build );
+							string localizedIconGuid = pbxProject.AddFile( iconRelativePath, iconRelativePath, PBXSourceTree.Source );
 							pbxProject.AddFileToBuild( unityFrameworkGUID, localizedIconGuid );
 #if UNITY_2019_3_OR_NEWER
 							pbxProject.AddFileToBuild( mainTargetGUID, localizedIconGuid );
