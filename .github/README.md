@@ -23,6 +23,12 @@ There are 4 ways to install this plugin:
 
 Localized App Title is licensed under the [MIT License](LICENSE). Please note that this asset uses [AppIconChangerUnity](https://github.com/kyubuns/AppIconChangerUnity) and [zipstorer](https://github.com/jaime-olivares/zipstorer) assets which are also licensed under the MIT License. See [ThirdPartyNotices.txt](../Plugins/LocalizedAppTitle/ThirdPartyNotices.txt) in the package for more details.
 
+## FAQ
+
+- **I'm getting Unrecognized Locale error on iOS**
+
+Please see: https://github.com/yasirkula/UnityMobileLocalizedAppTitle/issues/3
+
 ## HOW TO
 
 Simply open **Project Settings/Player/Localized Title** page (on older versions, it's located at **Preferences/Localized App Title**) and tweak the settings as you wish:
