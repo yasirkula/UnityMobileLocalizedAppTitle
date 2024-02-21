@@ -217,7 +217,7 @@ namespace LocalizedAppTitleNamespace
 			return EditorGUIUtility.singleLineHeight * ( rowCount + 1 ) + SPACE_BETWEEN_LIST_ELEMENTS + SPACE_BETWEEN_INPUT_FIELDS * rowCount;
 		}
 
-		private void GenerateAndroidResources()
+        private void GenerateAndroidResources()
 		{
 			Directory.CreateDirectory( Path.GetDirectoryName( ANDROID_RESOURCES_LIBRARY_PATH ) );
 
@@ -245,7 +245,22 @@ namespace LocalizedAppTitleNamespace
 				for( int i = 0; i < LocalizedData.Count; i++ )
 				{
 					string languageCode = LocalizedData[i].LanguageCode;
-					int languageSubCodeIndex = languageCode.IndexOf( '-' );
+                    // Exclusion does not work on android
+                    if ( languageCode == "zh-rHant"
+					  || languageCode == "zh-rHans")
+					{
+                        string NewLanguageCode = LocalizedAppTitlePostProcessBuild.ReplaceLanguageCode(languageCode);
+                        Debug.LogWarningFormat("(LocalizedAppTitle) {0} on Android does not work, skip! Use {1} for iOS instead!", languageCode, NewLanguageCode);
+                        continue;
+                    }
+					
+                    if ( languageCode == "zh-Hant"
+                      || languageCode == "zh-Hans")
+                    {
+                        Debug.LogWarningFormat("(LocalizedAppTitle) {0} on Android does not work, skip! But can work on iOS!", languageCode);
+                        continue;
+                    }
+                    int languageSubCodeIndex = languageCode.IndexOf( '-' );
 					if( languageSubCodeIndex > 0 && languageCode[languageSubCodeIndex + 1] != 'r' )
 					{
 						languageCode = string.Concat( languageCode.Substring( 0, languageSubCodeIndex ), "-r", languageCode.Substring( languageSubCodeIndex + 1 ) );
@@ -318,7 +333,7 @@ namespace LocalizedAppTitleNamespace
 		int IOrderedCallback.callbackOrder { get { return 0; } }
 
 #if UNITY_2018_1_OR_NEWER
-		void IPreprocessBuildWithReport.OnPreprocessBuild( BuildReport report )
+        void IPreprocessBuildWithReport.OnPreprocessBuild( BuildReport report )
 #else
 		void IPreprocessBuild.OnPreprocessBuild( BuildTarget target, string path )
 #endif
@@ -432,6 +447,18 @@ namespace LocalizedAppTitleNamespace
 
 	public static class LocalizedAppTitlePostProcessBuild
 	{
+        // Replace LanguageCode from "-r" to "-" for iOS
+        public static string ReplaceLanguageCode(string OriLanguageCode)
+        {
+            string NewLanguageCode = OriLanguageCode;
+            int languageSubCodeIndex = NewLanguageCode.IndexOf("-r");
+            if (languageSubCodeIndex > 0)
+            {
+                NewLanguageCode = NewLanguageCode.Replace("-r", "-");
+                Debug.LogWarning("(LocalizedAppTitle) Converted " + OriLanguageCode + " to " + NewLanguageCode);
+            }
+            return NewLanguageCode;
+        }
 #if UNITY_IOS
 		[PostProcessBuild( 1 )]
 		public static void OnPostprocessBuild( BuildTarget target, string buildPath )
@@ -466,15 +493,16 @@ namespace LocalizedAppTitleNamespace
 
 				foreach( LocalizedData localizedData in Settings.Instance.LocalizedData )
 				{
-					if( !processedLanguages.Add( localizedData.LanguageCode ) )
+                    string NewLanguageCode = ReplaceLanguageCode(localizedData.LanguageCode);
+                    if ( !processedLanguages.Add(NewLanguageCode) )
 					{
 						Debug.LogWarning( "(LocalizedAppTitle) Language was already added, skipping: " + localizedData.LanguageCode );
 						continue;
 					}
 
-					if( Settings.Instance.LocalizeAppNameOniOS )
+                    if ( Settings.Instance.LocalizeAppNameOniOS )
 					{
-						string localizationFolder = Path.Combine( buildPath, localizedData.LanguageCode + ".lproj" );
+                        string localizationFolder = Path.Combine( buildPath, NewLanguageCode + ".lproj" );
 						string localizedPlistPath = Path.Combine( localizationFolder, "InfoPlist.strings" );
 
 						// Create InfoPlist.strings files for localized app names
@@ -510,13 +538,13 @@ namespace LocalizedAppTitleNamespace
 						// Create localized icons
 						// Credit: https://stackoverflow.com/questions/51949430/changing-alternate-icon-for-ipad
 						// Credit (MIT-License): https://github.com/kyubuns/AppIconChangerUnity/blob/4c608cce17aa824f479a76386cc6008bdfd388f0/Assets/Plugins/AppIconChanger/Editor/PostProcesser.cs
-						string iconsFolderRelativePath = "LocalizedIcon_" + localizedData.LanguageCode;
+						string iconsFolderRelativePath = "LocalizedIcon_" + NewLanguageCode;
 						string iconsFolderFullPath = Path.Combine( buildPath, iconsFolderRelativePath );
 						Directory.CreateDirectory( iconsFolderFullPath );
 
 						for( int i = 0; i < iconsFilenames.Length; i++ )
 						{
-							string iconFilename = "LocalizedIcon_" + localizedData.LanguageCode + iconsFilenames[i];
+							string iconFilename = "LocalizedIcon_" + NewLanguageCode + iconsFilenames[i];
 							string iconRelativePath = iconsFolderRelativePath + "/" + iconFilename;
 							string iconFullPath = Path.Combine( iconsFolderFullPath, iconFilename );
 
@@ -553,8 +581,9 @@ namespace LocalizedAppTitleNamespace
 					PlistElementArray languagesArray = rootDict.GetOrCreateArray( "CFBundleLocalizations" );
 					foreach( LocalizedData localizedData in Settings.Instance.LocalizedData )
 					{
-						if( processedLanguages.Add( localizedData.LanguageCode ) )
-							languagesArray.AddStringIfNotExists( localizedData.LanguageCode );
+                        string NewLanguageCode = ReplaceLanguageCode(localizedData.LanguageCode);
+                        if ( processedLanguages.Add(NewLanguageCode) )
+							languagesArray.AddStringIfNotExists(NewLanguageCode);
 					}
 
 					processedLanguages.Clear();
@@ -574,11 +603,12 @@ namespace LocalizedAppTitleNamespace
 
 					foreach( LocalizedData localizedData in Settings.Instance.LocalizedData )
 					{
-						if( !processedLanguages.Add( localizedData.LanguageCode ) )
+                        string NewLanguageCode = ReplaceLanguageCode(localizedData.LanguageCode);
+                        if ( !processedLanguages.Add(NewLanguageCode) )
 							continue;
 
-						bundleAlternateIconsDict.CreateDict( "LocalizedIcon_" + localizedData.LanguageCode ).CreateBundleIconFilesDict( "LocalizedIcon_" + localizedData.LanguageCode + "_iPhone" );
-						bundleAlternateIconsDictIPad.CreateDict( "LocalizedIcon_" + localizedData.LanguageCode ).CreateBundleIconFilesDict( "LocalizedIcon_" + localizedData.LanguageCode + "_iPad", "LocalizedIcon_" + localizedData.LanguageCode + "_iPadPro" );
+                        bundleAlternateIconsDict.CreateDict( "LocalizedIcon_" + NewLanguageCode).CreateBundleIconFilesDict( "LocalizedIcon_" + NewLanguageCode + "_iPhone" );
+						bundleAlternateIconsDictIPad.CreateDict( "LocalizedIcon_" + NewLanguageCode).CreateBundleIconFilesDict( "LocalizedIcon_" + NewLanguageCode + "_iPad", "LocalizedIcon_" + NewLanguageCode + "_iPadPro" );
 					}
 
 					processedLanguages.Clear();
@@ -649,7 +679,7 @@ namespace LocalizedAppTitleNamespace
 			array.AddString( value );
 		}
 #endif
-	}
+    }
 
 	internal static class TextureScale
 	{
