@@ -32,6 +32,7 @@ namespace LocalizedAppTitleNamespace
 		private const float SPACE_BETWEEN_LIST_ELEMENTS = 6f;
 		private const float SPACE_BETWEEN_INPUT_FIELDS = 2f;
 
+		public bool ReplaceApplicationProductName;
 		public bool LocalizeAppNameOnAndroid = true;
 		public bool LocalizeAppIconOnAndroid = true;
 		public bool LocalizeAppNameOniOS = true;
@@ -150,6 +151,7 @@ namespace LocalizedAppTitleNamespace
 					AndroidIconResource = EditorGUILayout.DelayedTextField( androidIconResourceLabel, AndroidIconResource );
 			}
 
+			ReplaceApplicationProductName = EditorGUILayout.ToggleLeft( "Replace Application Product Name", ReplaceApplicationProductName );
 			if( EditorGUI.EndChangeCheck() )
 				Save();
 
@@ -305,7 +307,6 @@ namespace LocalizedAppTitleNamespace
 		{
 #pragma warning disable 0649
 			public bool LocalizedAppName;
-			public bool ReplaceApplicationProductName;
 			public string AppName;
 
 			public bool LocalizedAppIcons;
@@ -384,7 +385,7 @@ namespace LocalizedAppTitleNamespace
 			// Store the previous PlayerSettings values in a temporary file so that they can be restored in OnPostprocessBuild (i.e. non-destructive workflow)
 			File.WriteAllText( SERIALIZED_PLAYER_SETTINGS_FILE, EditorJsonUtility.ToJson( serializedPlayerSettings, false ) );
 
-			if( shouldLocalizeAppName && serializedPlayerSettings.ReplaceApplicationProductName)
+			if( shouldLocalizeAppName && Settings.Instance.ReplaceApplicationProductName)
 				PlayerSettings.productName = Settings.Instance.LocalizedData[Settings.Instance.DefaultLocalizedData].AppName;
 
 			if( shouldLocalizeAppIcon )
@@ -415,7 +416,7 @@ namespace LocalizedAppTitleNamespace
 				EditorJsonUtility.FromJsonOverwrite( File.ReadAllText( SERIALIZED_PLAYER_SETTINGS_FILE ), serializedPlayerSettings );
 				File.Delete( SERIALIZED_PLAYER_SETTINGS_FILE );
 
-				if( serializedPlayerSettings.LocalizedAppName && serializedPlayerSettings.ReplaceApplicationProductName)
+				if( serializedPlayerSettings.LocalizedAppName && Settings.Instance.ReplaceApplicationProductName)
 					PlayerSettings.productName = serializedPlayerSettings.AppName;
 				if( serializedPlayerSettings.LocalizedAppIcons )
 				{
