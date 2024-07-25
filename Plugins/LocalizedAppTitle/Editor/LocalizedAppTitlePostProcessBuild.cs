@@ -305,6 +305,7 @@ namespace LocalizedAppTitleNamespace
 		{
 #pragma warning disable 0649
 			public bool LocalizedAppName;
+			public bool ReplaceApplicationProductName;
 			public string AppName;
 
 			public bool LocalizedAppIcons;
@@ -383,7 +384,7 @@ namespace LocalizedAppTitleNamespace
 			// Store the previous PlayerSettings values in a temporary file so that they can be restored in OnPostprocessBuild (i.e. non-destructive workflow)
 			File.WriteAllText( SERIALIZED_PLAYER_SETTINGS_FILE, EditorJsonUtility.ToJson( serializedPlayerSettings, false ) );
 
-			if( shouldLocalizeAppName )
+			if( shouldLocalizeAppName && serializedPlayerSettings.ReplaceApplicationProductName)
 				PlayerSettings.productName = Settings.Instance.LocalizedData[Settings.Instance.DefaultLocalizedData].AppName;
 
 			if( shouldLocalizeAppIcon )
@@ -414,7 +415,7 @@ namespace LocalizedAppTitleNamespace
 				EditorJsonUtility.FromJsonOverwrite( File.ReadAllText( SERIALIZED_PLAYER_SETTINGS_FILE ), serializedPlayerSettings );
 				File.Delete( SERIALIZED_PLAYER_SETTINGS_FILE );
 
-				if( serializedPlayerSettings.LocalizedAppName )
+				if( serializedPlayerSettings.LocalizedAppName && serializedPlayerSettings.ReplaceApplicationProductName)
 					PlayerSettings.productName = serializedPlayerSettings.AppName;
 				if( serializedPlayerSettings.LocalizedAppIcons )
 				{
