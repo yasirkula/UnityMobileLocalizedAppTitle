@@ -219,7 +219,7 @@ namespace LocalizedAppTitleNamespace
 			return EditorGUIUtility.singleLineHeight * ( rowCount + 1 ) + SPACE_BETWEEN_LIST_ELEMENTS + SPACE_BETWEEN_INPUT_FIELDS * rowCount;
 		}
 
-		private void GenerateAndroidResources()
+		public void GenerateAndroidResources()
 		{
 			Directory.CreateDirectory( Path.GetDirectoryName( ANDROID_RESOURCES_LIBRARY_PATH ) );
 
