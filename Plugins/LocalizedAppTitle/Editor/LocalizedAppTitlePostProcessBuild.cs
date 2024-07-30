@@ -32,7 +32,7 @@ namespace LocalizedAppTitleNamespace
 		private const float SPACE_BETWEEN_LIST_ELEMENTS = 6f;
 		private const float SPACE_BETWEEN_INPUT_FIELDS = 2f;
 
-		public bool ReplaceApplicationProductName;
+		public bool ReplaceApplicationProductName = true;
 		public bool LocalizeAppNameOnAndroid = true;
 		public bool LocalizeAppIconOnAndroid = true;
 		public bool LocalizeAppNameOniOS = true;
