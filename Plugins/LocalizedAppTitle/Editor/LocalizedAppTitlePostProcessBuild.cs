@@ -37,6 +37,8 @@ namespace LocalizedAppTitleNamespace
 		public bool LocalizeAppNameOniOS = true;
 		public bool LocalizeAppIconOniOS = true;
 
+		public bool ReplacePlayerSettingsProductName = true;
+
 		public List<LocalizedData> LocalizedData = new List<LocalizedData>();
 		public int DefaultLocalizedData;
 		public string AndroidNameResource = "app_name", AndroidIconResource = "app_icon";
@@ -133,6 +135,14 @@ namespace LocalizedAppTitleNamespace
 			LocalizeAppNameOniOS = EditorGUILayout.ToggleLeft( "Localize App Name on iOS", LocalizeAppNameOniOS );
 			LocalizeAppIconOniOS = EditorGUILayout.ToggleLeft( localizeAppIconOniOSLabel, LocalizeAppIconOniOS );
 
+			if( ( LocalizeAppNameOnAndroid || LocalizeAppNameOniOS ) && Event.current.alt )
+			{
+				EditorGUILayout.Space();
+				ReplacePlayerSettingsProductName = EditorGUILayout.ToggleLeft( "Replace PlayerSettings.productName", ReplacePlayerSettingsProductName );
+			}
+
+			EditorGUILayout.Space();
+
 			if( EditorGUI.EndChangeCheck() )
 				localizedDataDrawer.elementHeight = CalculateReorderableListHeight();
 
@@ -217,7 +227,7 @@ namespace LocalizedAppTitleNamespace
 			return EditorGUIUtility.singleLineHeight * ( rowCount + 1 ) + SPACE_BETWEEN_LIST_ELEMENTS + SPACE_BETWEEN_INPUT_FIELDS * rowCount;
 		}
 
-		private void GenerateAndroidResources()
+		public void GenerateAndroidResources()
 		{
 			Directory.CreateDirectory( Path.GetDirectoryName( ANDROID_RESOURCES_LIBRARY_PATH ) );
 
@@ -383,7 +393,7 @@ namespace LocalizedAppTitleNamespace
 			// Store the previous PlayerSettings values in a temporary file so that they can be restored in OnPostprocessBuild (i.e. non-destructive workflow)
 			File.WriteAllText( SERIALIZED_PLAYER_SETTINGS_FILE, EditorJsonUtility.ToJson( serializedPlayerSettings, false ) );
 
-			if( shouldLocalizeAppName )
+			if( shouldLocalizeAppName && Settings.Instance.ReplacePlayerSettingsProductName )
 				PlayerSettings.productName = Settings.Instance.LocalizedData[Settings.Instance.DefaultLocalizedData].AppName;
 
 			if( shouldLocalizeAppIcon )
@@ -414,7 +424,7 @@ namespace LocalizedAppTitleNamespace
 				EditorJsonUtility.FromJsonOverwrite( File.ReadAllText( SERIALIZED_PLAYER_SETTINGS_FILE ), serializedPlayerSettings );
 				File.Delete( SERIALIZED_PLAYER_SETTINGS_FILE );
 
-				if( serializedPlayerSettings.LocalizedAppName )
+				if( serializedPlayerSettings.LocalizedAppName && Settings.Instance.ReplacePlayerSettingsProductName )
 					PlayerSettings.productName = serializedPlayerSettings.AppName;
 				if( serializedPlayerSettings.LocalizedAppIcons )
 				{
