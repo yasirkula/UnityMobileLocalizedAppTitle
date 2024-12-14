@@ -386,8 +386,13 @@ namespace LocalizedAppTitleNamespace
 				}
 
 				serializedPlayerSettings.LocalizedAppIcons = true;
+#if UNITY_2021_2_OR_NEWER
+				serializedPlayerSettings.TargetPlatformIcons = PlayerSettings.GetIcons( target == BuildTarget.Android ? NamedBuildTarget.Android : NamedBuildTarget.iOS, IconKind.Any );
+				serializedPlayerSettings.UnknownPlatformIcons = PlayerSettings.GetIcons( NamedBuildTarget.Unknown, IconKind.Any );
+#else
 				serializedPlayerSettings.TargetPlatformIcons = PlayerSettings.GetIconsForTargetGroup( target == BuildTarget.Android ? BuildTargetGroup.Android : BuildTargetGroup.iOS );
 				serializedPlayerSettings.UnknownPlatformIcons = PlayerSettings.GetIconsForTargetGroup( BuildTargetGroup.Unknown );
+#endif
 			}
 
 			// Store the previous PlayerSettings values in a temporary file so that they can be restored in OnPostprocessBuild (i.e. non-destructive workflow)
@@ -398,8 +403,13 @@ namespace LocalizedAppTitleNamespace
 
 			if( shouldLocalizeAppIcon )
 			{
+#if UNITY_2021_2_OR_NEWER
+				PlayerSettings.SetIcons( target == BuildTarget.Android ? NamedBuildTarget.Android : NamedBuildTarget.iOS, new Texture2D[0], IconKind.Any );
+				PlayerSettings.SetIcons( NamedBuildTarget.Unknown, new Texture2D[1] { Settings.Instance.LocalizedData[Settings.Instance.DefaultLocalizedData].AndroidIcon }, IconKind.Any ); // Credit: http://answers.unity.com/answers/1732975/view.html
+#else
 				PlayerSettings.SetIconsForTargetGroup( target == BuildTarget.Android ? BuildTargetGroup.Android : BuildTargetGroup.iOS, new Texture2D[0] );
 				PlayerSettings.SetIconsForTargetGroup( BuildTargetGroup.Unknown, new Texture2D[1] { Settings.Instance.LocalizedData[Settings.Instance.DefaultLocalizedData].AndroidIcon } ); // Credit: http://answers.unity.com/answers/1732975/view.html
+#endif
 			}
 		}
 
@@ -433,8 +443,13 @@ namespace LocalizedAppTitleNamespace
 					if( serializedPlayerSettings.TargetPlatformIcons != null && !System.Array.Find( serializedPlayerSettings.TargetPlatformIcons, ( icon ) => icon ) )
 						serializedPlayerSettings.TargetPlatformIcons = new Texture2D[0];
 
+#if UNITY_2021_2_OR_NEWER
+					PlayerSettings.SetIcons( target == BuildTarget.Android ? NamedBuildTarget.Android : NamedBuildTarget.iOS, serializedPlayerSettings.TargetPlatformIcons, IconKind.Any );
+					PlayerSettings.SetIcons( NamedBuildTarget.Unknown, serializedPlayerSettings.UnknownPlatformIcons, IconKind.Any );
+#else
 					PlayerSettings.SetIconsForTargetGroup( target == BuildTarget.Android ? BuildTargetGroup.Android : BuildTargetGroup.iOS, serializedPlayerSettings.TargetPlatformIcons );
 					PlayerSettings.SetIconsForTargetGroup( BuildTargetGroup.Unknown, serializedPlayerSettings.UnknownPlatformIcons );
+#endif
 				}
 			}
 		}
